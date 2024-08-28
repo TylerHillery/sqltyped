@@ -5,6 +5,9 @@ on:
     workflows: [Test]
     types: [completed]
 
+env:
+  PYTHON_VERSION: '3.9'
+
 jobs:
   smokeshow:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
@@ -17,11 +20,11 @@ jobs:
       - name: Set up uv
         run: curl -LsSf https://astral.sh/uv/install.sh | sh
       - name: Set up Python
-        run: uv python install 3.9
+        run: uv python install ${{ env.PYTHON_VERSION }}
 
       - uses: actions/download-artifact@v4
         with:
-          name: coverage-html
+          name: coverage-html-${{ env.PYTHON_VERSION }}
           path: htmlcov
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.workflow_run.id }}
