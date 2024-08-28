@@ -1,0 +1,33 @@
+[project]
+name = "sqltyped"
+version = "0.1.0"
+description = "Write raw SQL queries in a type safe way"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "SQLAlchemy >=2.0.14,<2.1.0",
+    "pydantic >=1.10.13,<3.0.0",
+]
+
+[project.urls]
+Repository = "https://github.com/tylerhillery/sqltyped"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+dev-dependencies = [
+    "ruff>=0.6.2",
+    "pre-commit>=3.8.0",
+    "pytest>=8.3.2",
+    "mypy>=1.11.2",
+    "coverage>=7.6.1",
+]
+
+[tool.mypy]
+strict = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
