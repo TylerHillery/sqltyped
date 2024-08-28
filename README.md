@@ -24,8 +24,8 @@ SQLTyped is a Python library that provides type safety for raw SQL queries.
 ## Inspiration
 
 SQLTyped draws inspiration from several libraries and tools:
-- [TypedSQL by Prisma](https://www.prisma.io/blog/announcing-typedsql-make-your-raw-sql-queries-type-safe-with-prisma-orm): Pioneering type-safe SQL queries in ORMs
-- [squirrel](https://github.com/giacomocavalieri/squirrel): Exploring type-safe database interactions for Gleam
+- [TypedSQL by Prisma](https://www.prisma.io/blog/announcing-typedsql-make-your-raw-sql-queries-type-safe-with-prisma-orm): Type-Safe SQL queries in TypeScript 
+- [squirrel](https://github.com/giacomocavalieri/squirrel): Type-Safe SQL queries in Gleam
 - [Yesql](https://github.com/krisajenkins/yesql): Raw SQL query management in Clojure
 - [aiosql](https://github.com/nackjicholson/aiosql): Raw SQL query management in Python
-- [SQLModel](https://github.com/fastapi/sqlmodel): Showcasing the seamless integration of SQLAlchemy with Pydantic
+- [SQLModel](https://github.com/fastapi/sqlmodel): Showcasing the integration of SQLAlchemy with Pydantic
