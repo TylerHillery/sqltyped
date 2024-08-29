@@ -1,13 +1,58 @@
 import argparse
+import re
 from pathlib import Path
-from typing import Dict
+from typing import List, NamedTuple
 
 
-def get_queries(dir: Path) -> list[Dict[str, Path]]:
-    queries = [{path.stem.replace(" ", "_"): path} for path in dir.rglob("*.sql")]
+class QueryParam(NamedTuple):
+    name: str
+    t: str
+
+
+class QueryMetadata(NamedTuple):
+    file_name: str
+    query_name: str
+    description: str
+    params: List[QueryParam]
+
+
+def parse_sql_file(file_path: Path) -> QueryMetadata:
+    with open(file_path, "r") as f:
+        content = f.read()
+
+    # TODO: verify all this regex
+    desc_match = re.search(r"--\s*description:\s*(.+)", content)
+    param_matches = re.findall(r"--\s*param:\s*(\w+)\s*\((\w+)\)", content)
+
+    description = desc_match.group(1) if desc_match else ""
+    params = [QueryParam(name=name, t=t) for name, t in param_matches]
+
+    return QueryMetadata(
+        file_name=file_path.name,
+        query_name=file_path.stem.replace(" ", "_"),
+        description=description,
+        params=params,
+    )
+
+
+def get_queries(dir: Path) -> list[QueryMetadata]:
+    queries = [parse_sql_file(path) for path in dir.rglob("*.sql")]
     if not queries:
         raise ValueError(f"No queries found in {dir}")
     return queries
+
+
+def generate_method(metadata: QueryMetadata) -> str:
+    param_str = ", ".join(f"{param.name}: {param.t}" for param in metadata.params)
+    param_dict = ", ".join(f'"{param.name}": {param.name}' for param in metadata.params)
+
+    return f'''
+    def {metadata.query_name}(self, {param_str}) -> Any:
+        """
+        {metadata.description}
+        """
+        return self.execute(QUERIES_DIR / "{metadata.file_name}", {{{param_dict}}})
+    '''
 
 
 def generate_output_file(output_file: Path) -> None:
@@ -17,12 +62,7 @@ def generate_output_file(output_file: Path) -> None:
     with open(output_file, "w") as file:
         file.write(template_content)
         for query in get_queries(output_file.parent):
-            for name, path in query.items():
-                # TODO: Add some sort ability to get typed params, like Prisma TypedSQL does
-                file.write(f"""
-    def {name}(self, **params) -> Any:
-        return self.execute(QUERIES_DIR / "{path.name}", **params)
-""")
+            file.write(generate_method(query))
 
     init_file = output_file.parent / "__init__.py"
     if not init_file.exists():

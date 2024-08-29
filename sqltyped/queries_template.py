@@ -1,7 +1,7 @@
 import os
 from sqlalchemy import Engine, text
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict
 
 QUERIES_DIR = Path(os.path.abspath(__file__)).parent
 
@@ -10,7 +10,7 @@ class Queries:
     def __init__(self, engine: Engine) -> None:
         self.engine = engine
 
-    def execute(self, sql_file: Path, **params: Any) -> Any:
+    def execute(self, sql_file: Path, params: Dict[str, Any]) -> Any:
         with open(sql_file, "r") as f:
             sql = f.read()
         with self.engine.connect().execution_options(
