@@ -11,26 +11,11 @@ def get_queries(dir: Path) -> list[Dict[str, Path]]:
 
 
 def generate_output_file(output_file: Path) -> None:
+    with open(Path(__file__).parent / "queries_template.py", "r") as template_file:
+        template_content = template_file.read()
+
     with open(output_file, "w") as file:
-        file.write("""import os
-from sqlalchemy import Engine, text
-from pathlib import Path
-from typing import Any
-
-QUERIES_DIR = Path(os.path.abspath(__file__)).parent
-
-class Queries:
-    def __init__(self, engine: Engine):
-        self.engine = engine
-
-    def execute(self, sql_file: Path, **params) -> Any:
-        with open(sql_file, 'r') as f:
-            sql = f.read()
-        with self.engine.connect().execution_options(isolation_level="AUTOCOMMIT") as conn:
-            result = conn.execute(text(sql), params)
-        return result
-
-""")
+        file.write(template_content)
         for query in get_queries(output_file.parent):
             for name, path in query.items():
                 # TODO: Add some sort ability to get typed params, like Prisma TypedSQL does
