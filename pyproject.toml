@@ -5,12 +5,15 @@ description = "Write raw SQL queries in a type safe way"
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
-    "SQLAlchemy >=2.0.14,<2.1.0",
     "pydantic >=1.10.13,<3.0.0",
+    "sqlglot[rs]>=25.18.0",
 ]
 
 [project.urls]
 Repository = "https://github.com/tylerhillery/sqltyped"
+
+[project.scripts]
+sqltyped = "sqltyped.__main__:main"
 
 [build-system]
 requires = ["hatchling"]

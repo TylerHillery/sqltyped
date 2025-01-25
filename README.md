@@ -29,3 +29,10 @@ SQLTyped draws inspiration from several libraries and tools:
 - [Yesql](https://github.com/krisajenkins/yesql): Raw SQL query management in Clojure
 - [aiosql](https://github.com/nackjicholson/aiosql): Raw SQL query management in Python
 - [SQLModel](https://github.com/fastapi/sqlmodel): Showcasing the integration of SQLAlchemy with Pydantic
+- [Pydantic data model code generator](https://github.com/koxudaxi/datamodel-code-generator): Showcasing how to generate pydantic models based on structured data
+- https://github.com/cashapp/sqldelight
+
+## Resources
+
+- [Python SQLite Cursor Object](https://docs.python.org/3/library/sqlite3.html#cursor-objects)
+- [The Novice's Guide to the Python 3 DB-API](https://philvarner.github.io/pages/novice-python3-db-api.html)

@@ -13,24 +13,30 @@ class QueryMetadata(NamedTuple):
     file_name: str
     query_name: str
     description: str
+    model: str
     params: List[QueryParam]
 
 
 def parse_sql_file(file_path: Path) -> QueryMetadata:
     with open(file_path, "r") as f:
         content = f.read()
-
     # TODO: verify all this regex
     desc_match = re.search(r"--\s*description:\s*(.+)", content)
+    # TODO: this doesn't account for having multiple parameters i.e. int | float
+    # TODO: need to handle all the valid dbapi 2.0 formats
+    #       only one is required per DB-API
+    #           - qmark, numeric, named, format, pyformat
     param_matches = re.findall(r"--\s*param:\s*(\w+)\s*\((\w+)\)", content)
 
-    description = desc_match.group(1) if desc_match else ""
+    description = desc_match.group(1) if desc_match else "No description in sql file"
     params = [QueryParam(name=name, t=t) for name, t in param_matches]
+    query_name = file_path.stem.replace(" ", "_")
 
     return QueryMetadata(
         file_name=file_path.name,
-        query_name=file_path.stem.replace(" ", "_"),
+        query_name=query_name,
         description=description,
+        model=query_name.title().replace("_", ""),
         params=params,
     )
 
@@ -46,12 +52,20 @@ def generate_method(metadata: QueryMetadata) -> str:
     param_str = ", ".join(f"{param.name}: {param.t}" for param in metadata.params)
     param_dict = ", ".join(f'"{param.name}": {param.name}' for param in metadata.params)
 
+    # TODO: not a big fan of this, need to better account for params an no params
+    required_params = (
+        "self, *, size: Union[int, None] = None, "
+        if param_str
+        else "self, *, size: Union[int, None] = None"
+    )
+    params_arg = f", {{{param_dict}}}" if param_dict else ""
+
     return f'''
-    def {metadata.query_name}(self, {param_str}) -> Any:
+    def {metadata.query_name}({required_params}{param_str}) -> Union[List[{metadata.model}], None]:
         """
         {metadata.description}
         """
-        return self.execute(QUERIES_DIR / "{metadata.file_name}", {{{param_dict}}})
+        return self.execute(QUERIES_DIR / "{metadata.file_name}", {metadata.model}, size{params_arg})
     '''
 
 
