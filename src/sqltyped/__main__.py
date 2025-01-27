@@ -1,3 +1,3 @@
-from sqltyped.cli import sqltyped
+from sqltyped.cli import main
 
-sqltyped()
+main()
